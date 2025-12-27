@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Новогодний пазл ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* ПРАВКА 2: Увеличили размеры пазла */
+  --w: 360px;
+  --h: 270px;
+  
+  /* Картинка */
+  --img: url("https://i.pinimg.com/736x/9d/8d/2d/9d8d2de1f5eceb488308a4f7d157c203.jpg");
+  --accent: #ffd700; 
+  --bg-glass: rgba(20, 40, 30, 0.65);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Montserrat', sans-serif;
+  background: radial-gradient(circle at 50% -20%, #2c5e43, #0f2218);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  color: #fff;
+  user-select: none;
+}
+
+/* ❄️ Снег */
+.snow-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.snowflake {
+  position: absolute;
+  top: -20px;
+  color: #fff;
+  font-size: 1em;
+  opacity: 0.8;
+  animation: fall linear infinite;
+}
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(360deg); }
+}
+
+/* Контейнер */
+.wrapper {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  width: 100%;
+  max-width: 420px; /* Чуть расширили контейнер */
+  padding: 10px;
+}
+
+h1 {
+  font-weight: 800;
+  font-size: 24px;
+  margin: 0 0 5px 0;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  background: linear-gradient(to right, #fff, #ffd700, #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: shine 3s linear infinite;
+}
+@keyframes shine { to { background-position: 200% center; } }
+
+.subtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 15px;
+}
+
+.stats {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  font-size: 13px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Стеклянная подложка */
+.stage {
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  transition: all 0.5s ease;
+  display: inline-block; /* Чтобы подстраивалось под размер пазла */
+}
+
+/* Превью */
+.preview-container {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.preview-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; opacity: 0.5; }
+
+.preview {
+  width: 120px; /* Чуть увеличили и превью */
+  height: 90px;
+  background-image: var(--img);
+  
+  /* ПРАВКА 1: contain вместо cover, чтобы не обрезалось */
+  background-size: contain; 
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: rgba(255,255,255,0.1); /* Легкий фон если пропорции не совпадут идеально */
+  
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border: 2px solid rgba(255,255,255,0.1);
+}
+
+/* Пазл */
+.puzzle {
+  width: var(--w);
+  height: var(--h);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  transition: gap 0.5s ease;
+}
+
+/* Плитка */
+.tile {
+  background-image: var(--img);
+  background-size: var(--w) var(--h);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, filter 0.2s;
+}
+
+.tile:active { transform: scale(0.92); }
+
+/* Выбранная плитка */
+.tile.selected {
+  z-index: 2;
+  transform: scale(1.05);
+  box-shadow: 0 0 0 2px var(--accent), 0 10px 20px rgba(0,0,0,0.3);
+  border-radius: 6px;
+  filter: brightness(1.1);
+}
+
+/* Победа */
+.puzzle.solved {
+  gap: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+}
+.puzzle.solved .tile {
+  border-radius: 0;
+  box-shadow: none;
+  cursor: default;
+  transform: none !important;
+}
+
+/* Финал */
+.final-screen {
+  display: none;
+  animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.8) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.gift-card {
+  margin-top: 20px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  border-radius: 20px;
+  padding: 25px;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.gift-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.gift-text { font-size: 14px; line-height: 1.6; opacity: 0.9; }
+.gift-note {
+  margin-top: 15px;
+  font-size: 12px;
+  padding: 10px;
+  background: rgba(255,215,0,0.1);
+  border-radius: 8px;
+  color: #ffe680;
+}
+
+/* Confetti */
+.confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+
+/* Адаптив: если экран меньше 380px, уменьшаем пазл */
+@media (max-width: 380px) {
+  :root { --w: 300px; --h: 225px; }
+  .wrapper { padding: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div class="snow-container" id="snow"></div>
+<div class="confetti-container" id="confetti"></div>
+
+<div class="wrapper">
+  
+  <div id="game-screen">
+    <h1>Собери праздник 🎄</h1>
+    <div class="subtitle">Перемещай кусочки, чтобы собрать открытку</div>
+    
+    <div class="stats">Ходов: <strong id="moves">0</strong></div>
+
+    <div class="stage">
+      <div class="preview-container">
+        <div class="preview-label">Цель:</div>
+        <div class="preview"></div>
+      </div>
+      <div class="puzzle" id="puzzle"></div>
+    </div>
+  </div>
+
+  <div id="final-screen" class="final-screen">
+    <div class="stage" id="final-stage"></div> 
+
+    <div class="gift-card">
+      <div class="gift-title">Сюрприз! ✨</div>
+      <div class="gift-text">
+        Пусть он принесет гармонию, красоту и вдохновение.
+      </div>
+      <div class="gift-note">
+        🎁 Совсем скоро небольшой<br>подарочек придет в WhatsApp.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// --- Настройки ---
+const COLS = 4;
+const ROWS = 3;
+let moves = 0;
+let selectedTile = null;
+
+// --- Снег ---
+const snowContainer = document.getElementById('snow');
+const symbols = ['❄️', '✨', '❅'];
+for (let i = 0; i < 50; i++) {
+  const el = document.createElement('div');
+  el.className = 'snowflake';
+  el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+  el.style.left = Math.random() * 100 + 'vw';
+  el.style.animationDuration = Math.random() * 5 + 5 + 's';
+  el.style.animationDelay = Math.random() * 5 + 's';
+  el.style.opacity = Math.random() * 0.5 + 0.3;
+  el.style.fontSize = Math.random() * 10 + 10 + 'px';
+  snowContainer.appendChild(el);
+}
+
+// --- Пазл ---
+const puzzleEl = document.getElementById('puzzle');
+const movesEl = document.getElementById('moves');
+const gameScreen = document.getElementById('game-screen');
+const finalScreen = document.getElementById('final-screen');
+const finalStage = document.getElementById('final-stage');
+
+let positions = [...Array(COLS * ROWS).keys()];
+positions.sort(() => Math.random() - 0.5);
+
+positions.forEach((pos, index) => {
+  const tile = document.createElement('div');
+  tile.className = 'tile';
+  tile.dataset.correctPos = pos;
+  setBg(tile, pos);
+  tile.onclick = () => handleTileClick(tile);
+  puzzleEl.appendChild(tile);
+});
+
+function setBg(element, posIndex) {
+  const x = (posIndex % COLS) * (100 / (COLS - 1));
+  const y = Math.floor(posIndex / COLS) * (100 / (ROWS - 1));
+  element.style.backgroundPosition = `${x}% ${y}%`;
+}
+
+function handleTileClick(tile) {
+  if (navigator.vibrate) navigator.vibrate(5);
+  if (!selectedTile) {
+    selectedTile = tile;
+    tile.classList.add('selected');
+  } else {
+    if (selectedTile === tile) {
+      selectedTile.classList.remove('selected');
+      selectedTile = null;
+    } else {
+      swapTiles(selectedTile, tile);
+      selectedTile.classList.remove('selected');
+      selectedTile = null;
+      moves++;
+      movesEl.textContent = moves;
+      checkWin();
+    }
+  }
+}
+
+function swapTiles(tileA, tileB) {
+  const tempBg = tileA.style.backgroundPosition;
+  const tempCorrect = tileA.dataset.correctPos;
+  tileA.style.backgroundPosition = tileB.style.backgroundPosition;
+  tileA.dataset.correctPos = tileB.dataset.correctPos;
+  tileB.style.backgroundPosition = tempBg;
+  tileB.dataset.correctPos = tempCorrect;
+}
+
+function checkWin() {
+  const tiles = [...document.querySelectorAll('.tile')];
+  const isWin = tiles.every((tile, index) => parseInt(tile.dataset.correctPos) === index);
+  if (isWin) onWin();
+}
+
+function onWin() {
+  puzzleEl.classList.add('solved');
+  launchConfetti();
+  setTimeout(() => {
+    gameScreen.style.display = 'none';
+    finalScreen.style.display = 'block';
+    finalStage.appendChild(puzzleEl);
+  }, 1200);
+}
+
+// --- Конфетти ---
+function launchConfetti() {
+  const colors = ['#ffd700', '#ff0000', '#ffffff', '#00ff00'];
+  const box = document.getElementById('confetti');
+  for (let i = 0; i < 150; i++) {
+    const c = document.createElement('div');
+    c.style.position = 'absolute';
+    c.style.width = Math.random() * 8 + 4 + 'px';
+    c.style.height = Math.random() * 6 + 4 + 'px';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.left = '50%';
+    c.style.top = '50%';
+    const angle = Math.random() * Math.PI * 2;
+    const velocity = Math.random() * 300 + 100;
+    const tx = Math.cos(angle) * velocity;
+    const ty = Math.sin(angle) * velocity;
+    
+    c.animate([
+      { transform: 'translate(0,0) rotate(0)', opacity: 1 },
+      { transform: `translate(${tx}px, ${ty}px) rotate(${Math.random()*720}deg)`, opacity: 0 }
+    ], {
+      duration: 1500,
+      easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+      fill: 'forwards'
+    });
+    
+    box.appendChild(c);
+    setTimeout(() => c.remove(), 1500);
+  }
+}
+</script>
+</body>
+</html>
